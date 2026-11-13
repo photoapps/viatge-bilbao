@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bilbao & Costa de Bizkaia · 5–8 diciembre 2026</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14212b; --muted:#5b6b78; --bg:#f5f1ea; --card:#fffdf9; --line:#e6ddd0;
+  --sea:#0f5c6e; --sea2:#1b8a9b; --sun:#e8743b; --sun2:#f2b25c; --green:#3f7d4e;
+  --shadow:0 10px 30px -12px rgba(20,33,43,.25);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5}
+a{color:var(--sea);text-decoration:none}
+a:hover{text-decoration:underline}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.15}
+
+/* HEADER compacto */
+header{position:relative;color:#fff;overflow:hidden;
+  background:linear-gradient(120deg,#0b3b4a 0%,#145a6b 45%,#c9643a 85%,#f2b25c 100%)}
+header .sun{position:absolute;right:6%;top:50%;width:220px;height:220px;margin-top:-110px;border-radius:50%;
+  background:radial-gradient(circle,#ffe2a8 0%,#f6a54c 50%,rgba(246,165,76,0) 70%);opacity:.7}
+.head{position:relative;max-width:1180px;margin:0 auto;padding:22px 20px 18px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.head .eyebrow{letter-spacing:.16em;text-transform:uppercase;font-size:.72rem;opacity:.85}
+.head h1{font-size:clamp(1.6rem,3.4vw,2.4rem);margin-top:4px}
+.stats{display:flex;gap:8px;flex-wrap:wrap}
+.stat{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:7px 12px;text-align:center}
+.stat b{display:block;font-family:Fraunces,serif;font-size:1.1rem}
+.stat span{font-size:.7rem;opacity:.85}
+
+/* NAV de vistas */
+nav.views{position:sticky;top:0;z-index:100;background:rgba(245,241,234,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav.views .wrap{max-width:1180px;margin:0 auto;display:flex;gap:4px;padding:8px 16px;overflow-x:auto}
+nav.views a{display:flex;align-items:center;gap:7px;white-space:nowrap;padding:9px 15px;border-radius:999px;color:var(--ink);font-weight:600;font-size:.9rem}
+nav.views a:hover{background:#ebe3d6;text-decoration:none}
+nav.views a.on{background:var(--sea);color:#fff}
+
+main{max-width:1180px;margin:0 auto;padding:20px 16px 40px}
+.view{display:none;animation:fade .3s ease}
+.view.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.vhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.vhead h2{font-size:1.6rem}
+.vhead p{color:var(--muted);font-size:.9rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+.muted{color:var(--muted)}
+.small{font-size:.8rem}
+
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--sun);color:#fff;padding:10px 16px;border-radius:12px;font-weight:600;border:0;cursor:pointer;font-size:.9rem;font-family:inherit}
+.btn:hover{background:#d4612a;text-decoration:none}
+.btn.sea{background:var(--sea)} .btn.sea:hover{background:#0b4756}
+.btn.ghost{background:transparent;color:var(--sea);border:1.5px solid var(--sea)}
+.btn.ghost:hover{background:var(--sea);color:#fff}
+
+/* banner */
+.banner{display:flex;gap:14px;align-items:center;background:#fff5ee;border:1px solid #f3d3bf;border-left:5px solid var(--sun);border-radius:14px;padding:12px 16px;margin-bottom:14px;font-size:.9rem}
+.banner b{color:#b4521f}
+.banner .grow{flex:1}
+
+/* ITINERARIO */
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.tab{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:10px 12px;text-align:left;cursor:pointer;transition:.2s;font:inherit;color:inherit}
+.tab:hover{border-color:var(--sea2)}
+.tab.on{background:var(--sea);color:#fff;border-color:var(--sea);box-shadow:var(--shadow)}
+.tab .d{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;opacity:.75}
+.tab .t{font-family:Fraunces,serif;font-size:1.02rem}
+.tab .k{font-size:.76rem;opacity:.85}
+
+.day{display:none}
+.day.on{display:block}
+.day-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;height:620px}
+.day-grid > .card{display:flex;flex-direction:column;min-height:0}
+.day-head h3{font-size:1.3rem}
+.day-head p{color:var(--muted);margin:4px 0 10px;font-size:.9rem}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chip{background:#eef5f6;color:var(--sea);border-radius:999px;padding:4px 10px;font-size:.78rem;font-weight:600}
+.chip.sun{background:#fcebe0;color:#b4521f}
+.chip.green{background:#e8f2ea;color:var(--green)}
+.scroll{overflow-y:auto;flex:1;min-height:0;padding-right:6px;margin-right:-6px}
+.scroll::-webkit-scrollbar{width:6px}.scroll::-webkit-scrollbar-thumb{background:#d8cdbd;border-radius:9px}
+
+.timeline{list-style:none;position:relative}
+.timeline:before{content:"";position:absolute;left:58px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.stop{position:relative;display:grid;grid-template-columns:50px 1fr;gap:20px;padding:5px 0;cursor:pointer}
+.stop .time{font-weight:700;font-size:.82rem;color:var(--sea);padding-top:9px;text-align:right}
+.stop .dot{position:absolute;left:52px;top:15px;width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid var(--sea2);transition:.2s}
+.stop.sunset .dot{border-color:var(--sun);background:var(--sun2)}
+.stop .body{background:#faf6ef;border:1px solid transparent;border-radius:12px;padding:8px 12px;transition:.2s}
+.stop:hover .body{border-color:var(--line);background:#fff}
+.stop.open .body{background:#fff;border-color:var(--sea2);box-shadow:0 6px 18px -10px rgba(15,92,110,.5)}
+.stop.open .dot{background:var(--sea2);transform:scale(1.2)}
+.stop .name{font-weight:600;display:flex;justify-content:space-between;gap:10px;font-size:.93rem}
+.stop .name small{color:var(--muted);font-weight:500;white-space:nowrap}
+.stop .blurb{color:var(--muted);font-size:.86rem}
+.stop .more{display:none;margin-top:8px;font-size:.86rem}
+.stop.open .more{display:block}
+.stop .more ul{margin:4px 0 8px 18px}
+.stop .links{display:flex;flex-wrap:wrap;gap:6px}
+.stop .links a{font-size:.78rem;background:#eef5f6;padding:4px 9px;border-radius:8px;font-weight:600}
+.price{display:inline-block;font-size:.72rem;font-weight:700;background:#e8f2ea;color:var(--green);border-radius:6px;padding:1px 7px;margin-left:6px;vertical-align:middle}
+.alt{margin-top:10px;background:#fff5ee;border:1px dashed #f0b894;border-radius:12px;padding:10px 12px;font-size:.84rem}
+
+.map{flex:1;min-height:240px;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#dfe9ea}
+.legs{margin-top:10px;font-size:.82rem}
+.legs table{width:100%;border-collapse:collapse}
+.legs td{padding:4px 2px;border-bottom:1px dashed var(--line)}
+.legs td:last-child{text-align:right;color:var(--muted);white-space:nowrap}
+.legs tr.total td{font-weight:700;color:var(--ink);border-bottom:0}
+.legs .btn{margin-top:8px;width:100%;justify-content:center}
+
+/* GAZTELUGATXE */
+.g-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:14px}
+.status{display:flex;gap:12px;align-items:center;padding:14px 16px;border-radius:14px;background:linear-gradient(135deg,#0f5c6e,#c9643a);color:#fff;margin-bottom:14px}
+.status .e{font-size:1.8rem}
+.status b{font-family:Fraunces,serif;font-size:1.1rem}
+.plans{display:flex;flex-direction:column;gap:10px}
+.plan{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:#fff;cursor:pointer;transition:.2s}
+.plan:hover{border-color:var(--sea2)}
+.plan .top{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.plan h4{font-size:.98rem}
+.plan .tag{font-size:.7rem;font-weight:700;border-radius:99px;padding:3px 9px;white-space:nowrap}
+.tag.ok{background:#e8f2ea;color:var(--green)} .tag.wait{background:#fff1d6;color:#9a6a0a} .tag.view{background:#eef5f6;color:var(--sea)}
+.plan p{font-size:.86rem;color:var(--muted);display:none;margin-top:6px}
+.plan.open p{display:block}
+.mail{background:#faf6ef;border:1px solid var(--line);border-radius:12px;padding:14px;font-size:.88rem;white-space:pre-wrap;max-height:330px;overflow-y:auto}
+.mail-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.countdown{display:flex;gap:6px;margin-top:10px}
+.countdown div{background:rgba(255,255,255,.18);border-radius:10px;padding:5px 9px;text-align:center;min-width:52px}
+.countdown b{display:block;font-family:Fraunces,serif;font-size:1.1rem}
+.countdown span{font-size:.65rem;text-transform:uppercase;letter-spacing:.06em;opacity:.85}
+
+/* PRESUPUESTO */
+.budget{display:grid;grid-template-columns:320px 1fr;gap:14px}
+.ctrl label{display:block;font-size:.8rem;font-weight:600;color:var(--muted);margin:12px 0 5px}
+.ctrl label:first-child{margin-top:0}
+.seg{display:flex;background:#efe8dc;border-radius:12px;padding:4px;gap:4px}
+.seg button{flex:1;border:0;background:transparent;padding:7px 6px;border-radius:9px;font:inherit;font-size:.83rem;font-weight:600;cursor:pointer;color:var(--ink)}
+.seg button.on{background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.08);color:var(--sea)}
+.ctrl input[type=range]{width:100%;accent-color:var(--sea)}
+.ctrl .val{float:right;color:var(--ink)}
+.totals{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.tot{border-radius:14px;padding:12px 16px;color:#fff;background:linear-gradient(135deg,var(--sea),var(--sea2))}
+.tot.two{background:linear-gradient(135deg,#c9643a,var(--sun2))}
+.tot span{font-size:.75rem;opacity:.9;text-transform:uppercase;letter-spacing:.08em}
+.tot b{display:block;font-family:Fraunces,serif;font-size:1.9rem;line-height:1.1}
+.btabs{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.btabs button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 12px;font:inherit;font-size:.8rem;font-weight:600;cursor:pointer}
+.btabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btable{width:100%;border-collapse:collapse;font-size:.86rem}
+.btable th{text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:5px 4px;border-bottom:1px solid var(--line)}
+.btable th:nth-child(n+2),.btable td:nth-child(n+2){text-align:right;white-space:nowrap}
+.btable td{padding:7px 4px;border-bottom:1px dashed var(--line);vertical-align:top}
+.btable td small{display:block;color:var(--muted);font-size:.75rem}
+.btable tr.sum td{font-weight:700;border-bottom:0}
+.tag-est{font-size:.65rem;background:#fcebe0;color:#b4521f;border-radius:6px;padding:1px 6px;margin-left:4px;font-weight:600}
+.donut-wrap{display:flex;gap:16px;align-items:center;margin-bottom:12px}
+.legend{display:flex;flex-direction:column;gap:5px;font-size:.82rem}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}
+.bars{display:flex;flex-direction:column;gap:7px;margin-top:6px}
+.bar-row{display:grid;grid-template-columns:80px 1fr 64px;gap:10px;align-items:center;font-size:.82rem}
+.bar{height:10px;background:#ebe3d6;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sea),var(--sea2));border-radius:99px;width:0;transition:width 1s ease}
+
+/* HOTEL */
+.hotels{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.hotel{position:relative}
+.hotel .badge{position:absolute;top:-9px;right:14px;background:var(--green);color:#fff;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:99px}
+.hotel h3{font-size:1.2rem}
+.hotel .addr{color:var(--muted);font-size:.85rem;margin-bottom:10px}
+.score{display:inline-flex;background:var(--sea);color:#fff;border-radius:8px;padding:3px 9px;font-weight:700;font-size:.85rem}
+.pc{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0;font-size:.85rem}
+.pc ul{list-style:none} .pc li{padding:2px 0}
+.pc .pro li:before{content:"✓ ";color:var(--green);font-weight:700}
+.pc .con li:before{content:"✗ ";color:#c0392b;font-weight:700}
+.hotel .actions{display:flex;flex-wrap:wrap;gap:8px}
+
+/* PREPARATIVOS */
+.prep{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.acc{border-bottom:1px solid var(--line)}
+.acc:last-child{border-bottom:0}
+.acc button{width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:0;padding:11px 2px;font:inherit;font-weight:600;cursor:pointer;color:var(--ink);text-align:left}
+.acc button:after{content:"+";font-size:1.2rem;color:var(--sea)}
+.acc.open button:after{content:"–"}
+.acc div{display:none;padding:0 2px 12px;font-size:.88rem;color:var(--muted)}
+.acc.open div{display:block}
+.check{list-style:none;display:flex;flex-direction:column;gap:6px}
+.check label{display:flex;gap:10px;align-items:center;background:#faf6ef;border-radius:10px;padding:8px 12px;cursor:pointer;font-size:.88rem}
+.check input{width:17px;height:17px;accent-color:var(--sea)}
+.check input:checked + span{text-decoration:line-through;color:var(--muted)}
+.progress{height:7px;background:#ebe3d6;border-radius:99px;margin:6px 0 12px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--green);width:0;transition:.4s}
+.links-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.links-grid a{background:#faf6ef;border-radius:10px;padding:9px 12px;display:flex;justify-content:space-between;align-items:center;font-weight:500;color:var(--ink);font-size:.86rem}
+.links-grid a:hover{background:#eef5f6;text-decoration:none}
+
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:12px;font-size:.88rem;opacity:0;transition:.3s;pointer-events:none;z-index:300}
+.toast.show{opacity:1;transform:translateX(-50%)}
+
+footer{text-align:center;color:var(--muted);font-size:.78rem;padding:10px 16px 30px}
+
+/* MÓVIL: nav inferior tipo app */
+@media (max-width:860px){
+  .head{padding:16px 16px 14px}
+  .stats{display:none}
+  nav.views{position:fixed;top:auto;bottom:0;left:0;right:0;border-top:1px solid var(--line);border-bottom:0}
+  nav.views .wrap{justify-content:space-around;padding:6px 4px;gap:0}
+  nav.views a{flex-direction:column;gap:2px;font-size:.66rem;padding:6px 8px;border-radius:12px}
+  nav.views a .ic{font-size:1.25rem}
+  main{padding-bottom:90px}
+  .tabs{grid-template-columns:repeat(4,1fr);gap:6px}
+  .tab{padding:8px}
+  .tab .t,.tab .k{display:none}
+  .tab .d{font-size:.68rem;opacity:1;font-weight:700}
+  .day-grid{grid-template-columns:1fr;height:auto}
+  .day-grid > .card{display:block}
+  .map{height:260px}
+  .scroll{overflow:visible}
+  .g-grid,.budget,.hotels,.prep{grid-template-columns:1fr}
+  .banner{flex-wrap:wrap}
+  footer{padding-bottom:90px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="sun"></div>
+  <div class="head">
+    <div>
+      <div class="eyebrow">Puente de diciembre · 2 personas · en coche</div>
+      <h1>Bilbao & la costa de Bizkaia</h1>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>5–8 dic</b><span>4 días · 3 noches</span></div>
+      <div class="stat"><b id="statKm">~1.100</b><span>km</span></div>
+      <div class="stat"><b id="statPP">—</b><span>por persona</span></div>
+      <div class="stat"><b>17:52</b><span>puesta de sol</span></div>
+    </div>
+  </div>
+</header>
+
+<nav class="views"><div class="wrap">
+  <a href="#itinerario" data-v="itinerario"><span class="ic">🗓️</span>Itinerario</a>
+  <a href="#gaztelugatxe" data-v="gaztelugatxe"><span class="ic">🌅</span>Gaztelugatxe</a>
+  <a href="#presupuesto" data-v="presupuesto"><span class="ic">💶</span>Presupuesto</a>
+  <a href="#hotel" data-v="hotel"><span class="ic">🏨</span>Hotel</a>
+  <a href="#preparativos" data-v="preparativos"><span class="ic">✅</span>Preparativos</a>
+</div></nav>
+
+<main>
+
+<!-- ============ ITINERARIO ============ -->
+<section class="view" id="v-itinerario">
+  <div class="banner">
+    <span style="font-size:1.4rem">🌅</span>
+    <div class="grow"><b>Gaztelugatxe: aforo completo del 5 al 8.</b> El lunes está planteado con el amanecer en la ermita (sin reserva antes de las 10:00) y la puesta de sol desde el mirador.</div>
+    <a class="btn ghost" href="#gaztelugatxe">Ver alternativas</a>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div id="days"></div>
+</section>
+
+<!-- ============ GAZTELUGATXE ============ -->
+<section class="view" id="v-gaztelugatxe">
+  <div class="vhead"><h2>San Juan de Gaztelugatxe</h2><p>Plan con el aforo completo</p></div>
+  <div class="status">
+    <div class="e">📸</div>
+    <div style="flex:1">
+      <b>Atardecer en Gaztelugatxe · lunes 7 de diciembre, 17:52</b>
+      <div class="countdown" id="countdown"></div>
+    </div>
+  </div>
+  <div class="g-grid">
+    <div class="card">
+      <h3 style="font-size:1.1rem;margin-bottom:10px">Opciones (pulsa para ver detalles)</h3>
+      <div class="plans">
+        <div class="plan open"><div class="top"><h4>1 · Amanecer en la ermita, antes de las 10:00</h4><span class="tag ok">Plan principal</span></div>
+          <p>En los días con reserva, el control de acceso empieza a las 10:00. Antes, el paso es libre. Salid de Bilbao a las 7:30 para llegar hacia las 8:15: amanece sobre las 8:35 y tendréis el parking y el camino casi vacíos. Llevad frontal para el primer tramo.</p></div>
+        <div class="plan"><div class="top"><h4>2 · Atardecer desde el mirador o el Eneperi</h4><span class="tag view">Sin reserva</span></div>
+          <p>El Mirador de Gaztelugatxe y las terrazas del restaurante Eneperi, junto al acceso de Urizarreta, tienen vista directa al islote y no requieren ticket. Es la foto clásica del puente de piedra con la ermita al fondo. La zona entre Matxitxako y Gaztelugatxe es otra buena opción para la puesta de sol.</p></div>
+        <div class="plan"><div class="top"><h4>3 · Entrar después de las 17:00</h4><span class="tag wait">Pendiente de confirmar</span></div>
+          <p>La última entrada controlada en invierno es a las 17:00. Fuera del horario de control el acceso suele ser libre, pero para diciembre no está confirmado. Es la pregunta clave del correo: si responden que sí, el atardecer se puede ver desde la ermita.</p></div>
+        <div class="plan"><div class="top"><h4>4 · Cancelaciones de última hora</h4><span class="tag wait">Revisar a diario</span></div>
+          <p>No presentarse sin cancelar bloquea las reservas durante un año, así que la gente libera plazas. Mirad la web de reservas cada día, sobre todo las 24–48 h anteriores.</p></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        <a class="btn" target="_blank" rel="noopener" href="https://www.bizkaia.eus/es/gaztelugatxe">Web de reservas →</a>
+        <a class="btn ghost" href="tel:+34688738147">📞 688 73 81 47</a>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:1.1rem;margin-bottom:4px">Correo a la Diputación</h3>
+      <p class="small muted" style="margin-bottom:10px">Para: gaztelugatxe@bizkaia.eus</p>
+      <div class="mail" id="mailText"></div>
+      <div class="mail-actions">
+        <button class="btn sea" id="copyMail">📋 Copiar texto</button>
+        <a class="btn ghost" id="mailto" href="#">✉️ Abrir en el correo</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRESUPUESTO ============ -->
+<section class="view" id="v-presupuesto">
+  <div class="vhead"><h2>Presupuesto aproximado</h2><p>Se recalcula al cambiar las opciones</p></div>
+  <div class="budget">
+    <div class="card ctrl">
+      <label>Hotel</label>
+      <div class="seg" id="segHotel"><button data-v="ibis" class="on">ibis Centro</button><button data-v="gran">Gran Bilbao</button></div>
+      <label>Precio por noche <span class="val" id="vNoche"></span></label>
+      <input type="range" id="rNoche" min="70" max="250" step="5">
+      <label>Nivel de comidas</label>
+      <div class="seg" id="segFood"><button data-v="0.7">Ahorro</button><button data-v="1" class="on">Normal</button><button data-v="1.45">Capricho</button></div>
+      <label>Combustible</label>
+      <div class="seg" id="segFuel"><button data-v="g" class="on">Gasolina 95</button><button data-v="d">Diésel</button></div>
+      <label>Consumo <span class="val" id="vCons"></span></label>
+      <input type="range" id="rCons" min="4" max="10" step="0.1" value="6.5">
+      <label>Precio del litro <span class="val" id="vLitro"></span></label>
+      <input type="range" id="rLitro" min="1.40" max="2.10" step="0.01">
+      <label style="margin-top:16px">Kilómetros por día</label>
+      <div class="bars" id="bars"></div>
+      <p class="small muted" style="margin-top:10px">Precio medio el 10/11/2026: gasolina 95 a 1,668 €/l y diésel a 1,864 €/l. El hotel es una estimación para el puente: pon el precio real cuando reserves.</p>
+    </div>
+    <div class="card">
+      <div class="totals">
+        <div class="tot"><span>Por persona</span><b id="tPP">—</b></div>
+        <div class="tot two"><span>Total los dos</span><b id="tTwo">—</b></div>
+      </div>
+      <div class="donut-wrap">
+        <svg id="donut" width="120" height="120" viewBox="0 0 42 42"></svg>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="btabs" id="btabs"></div>
+      <table class="btable"><thead><tr><th>Concepto</th><th>Por persona</th><th>Los dos</th></tr></thead><tbody id="bBody"></tbody></table>
+      <p class="small muted" style="margin-top:10px"><span class="tag-est">estimado</span> = precio orientativo. Los gastos del coche y del hotel se reparten entre los dos.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOTEL ============ -->
+<section class="view" id="v-hotel">
+  <div class="vhead"><h2>Dónde dormir (3 noches)</h2><p>Base fija en Bilbao, con parking</p></div>
+  <div class="hotels">
+    <div class="card hotel">
+      <span class="badge">Recomendado · barato</span>
+      <h3>ibis Bilbao Centro</h3>
+      <div class="addr">C/ General Concha 28 · Ensanche</div>
+      <span class="score">8,1 · +7.000 opiniones</span>
+      <div class="pc">
+        <ul class="pro"><li>Céntrico: 560 m de Plaza Moyua</li><li>Guggenheim a ~15 min a pie</li><li>Parking propio (~11 €/noche)</li><li>Recepción 24 h</li></ul>
+        <ul class="con"><li>Habitaciones pequeñas (12 m²)</li><li>Sin armario</li><li>Sube de precio en el puente</li></ul>
+      </div>
+      <div class="actions">
+        <a class="btn sea" target="_blank" rel="noopener" href="https://www.booking.com/hotel/es/ibis-bilbao-centro.es.html?checkin=2026-12-05&checkout=2026-12-08&group_adults=2&no_rooms=1">Ver en Booking</a>
+        <a class="btn ghost" target="_blank" rel="noopener" href="https://all.accor.com/hotel/6141/index.es.shtml">Web oficial</a>
+        <a class="btn ghost" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=ibis+Bilbao+Centro+General+Concha+28">Mapa</a>
+      </div>
+    </div>
+    <div class="card hotel">
+      <span class="badge" style="background:var(--sea2)">Más confort</span>
+      <h3>Hotel Gran Bilbao ★★★★</h3>
+      <div class="addr">Av. Indalecio Prieto 1 · junto a Atxuri</div>
+      <span class="score">8,8 · +12.000 opiniones</span>
+      <div class="pc">
+        <ul class="pro"><li>Habitaciones amplias</li><li>Parking cubierto (~17 €/día)</li><li>Acceso directo desde la A-8</li><li>Buen desayuno buffet</li></ul>
+        <ul class="con"><li>~2 km del Casco Viejo</li><li>Hay que tirar de tranvía o bus</li></ul>
+      </div>
+      <div class="actions">
+        <a class="btn sea" target="_blank" rel="noopener" href="https://www.booking.com/hotel/es/hotel-gran-bilbao.es.html?checkin=2026-12-05&checkout=2026-12-08&group_adults=2&no_rooms=1">Ver en Booking</a>
+        <a class="btn ghost" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=Hotel+Gran+Bilbao+Indalecio+Prieto+1">Mapa</a>
+      </div>
+    </div>
+  </div>
+  <p class="small muted" style="margin-top:10px">Precios no verificados para estas fechas. Reserva pronto con cancelación gratuita.</p>
+</section>
+
+<!-- ============ PREPARATIVOS ============ -->
+<section class="view" id="v-preparativos">
+  <div class="vhead"><h2>Preparativos</h2><p id="progText"></p></div>
+  <div class="prep">
+    <div class="card">
+      <h3 style="font-size:1.1rem">Checklist</h3>
+      <div class="progress"><i id="progBar"></i></div>
+      <ul class="check" id="check"></ul>
+    </div>
+    <div class="card">
+      <h3 style="font-size:1.1rem;margin-bottom:4px">Consejos</h3>
+      <div id="acc"></div>
+      <div class="links-grid" id="links"></div>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer>Itinerario para el puente de diciembre de 2026 · Distancias, horarios y precios aproximados: confírmalos antes de ir.</footer>
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* ---------- LUGARES ---------- */
+const P = {
+  tgn:{n:"Tarragona",c:[41.1189,1.2445]},
+  hotel:{n:"ibis Bilbao Centro",c:[43.257839,-2.935667]},
+  bellas:{n:"Museo de Bellas Artes",c:[43.2647,-2.9377]},
+  arriaga:{n:"Teatro Arriaga",c:[43.2596,-2.9248]},
+  pnueva:{n:"Plaza Nueva",c:[43.2593,-2.9231]},
+  gugg:{n:"Museo Guggenheim",c:[43.2687,-2.9340]},
+  salve:{n:"Puente de La Salve",c:[43.2672,-2.9310]},
+  funi:{n:"Funicular de Artxanda",c:[43.2687,-2.9254]},
+  artx:{n:"Mirador de Artxanda",c:[43.2745,-2.9248]},
+  cated:{n:"Catedral de Santiago",c:[43.2573,-2.9237]},
+  gernika:{n:"Gernika · Casa de Juntas",c:[43.3135,-2.6795]},
+  mundaka:{n:"Mundaka",c:[43.4075,-2.6985]},
+  bermeo:{n:"Bermeo · puerto",c:[43.4205,-2.7225]},
+  matx:{n:"Cabo Matxitxako",c:[43.4545,-2.7520]},
+  gaz:{n:"Ermita de San Juan de Gaztelugatxe",c:[43.4470,-2.7845]},
+  mirador:{n:"Mirador de Gaztelugatxe / Eneperi",c:[43.4433,-2.7810]},
+  colg:{n:"Puente Colgante",c:[43.3230,-3.0170]},
+  algorta:{n:"Puerto Viejo de Algorta",c:[43.3510,-3.0110]}
+};
+const gq = k => encodeURIComponent(P[k].c.join(','));
+const dir = (pts,mode='driving') => {
+  const o=pts[0],d=pts[pts.length-1],w=pts.slice(1,-1);
+  return `https://www.google.com/maps/dir/?api=1&origin=${gq(o)}&destination=${gq(d)}${w.length?'&waypoints='+w.map(gq).join('%7C'):''}&travelmode=${mode}`;
+};
+const pin = k => `https://www.google.com/maps/search/?api=1&query=${gq(k)}`;
+
+/* ---------- DÍAS ---------- */
+const DAYS = [
+ {id:"d1",date:"Sáb 5",title:"Llegada y Bilbao",km:478,drive:"~4 h 45",walk:"~4 km",
+  intro:"Viaje desde Tarragona, check-in, arte gratis en Bellas Artes y primera noche de pintxos.",
+  chips:[["🚗 478 km",""],["⏱️ 4 h 45",""],["🚶 4 km","green"]],
+  mode:"driving",route:["tgn","hotel"],
+  legs:[["Tarragona → Bilbao (AP-2 + AP-68)","475 km · 4 h 45"],["Hotel → Bellas Artes (a pie)","0,9 km · 12 min"],["Bellas Artes → Arriaga (por la ría)","1,8 km · 25 min"],["Arriaga → Plaza Nueva","0,2 km · 3 min"]],
+  stops:[
+   {t:"08:30",k:"tgn",p:"Gasolina ~60 €",name:"Salida desde Tarragona",blurb:"Unos 475 km por AP-2 y AP-68.",more:["Parada a mitad de camino en Zaragoza o en la zona de Tudela/Alfaro.","Sal pronto: es la operación salida del puente."],links:[["Ruta en Google Maps",dir(["tgn","hotel"])]]},
+   {t:"14:00",k:"hotel",p:"Parking ~11 €/noche",dur:"30 min",name:"Check-in y aparcar",blurb:"El coche se queda en el parking hasta el lunes.",more:["Desde aquí todo el centro se hace a pie."],links:[["Ver en mapa",pin("hotel")]]},
+   {t:"16:00",k:"bellas",p:"Gratis",dur:"2 h",name:"Museo de Bellas Artes",blurb:"Entrada gratuita. El sábado abre hasta las 20:00.",more:["De El Greco y Goya a artistas vascos.","Junto al parque de Doña Casilda."],links:[["Web del museo","https://www.museobilbao.com"],["A pie desde el hotel",dir(["hotel","bellas"],"walking")]]},
+   {t:"18:30",k:"arriaga",dur:"45 min",name:"Paseo por la ría hasta el Arriaga",blurb:"La ría iluminada y el teatro neobarroco.",more:["Ruta: Bellas Artes → Guggenheim (por fuera, de noche) → Uribitarte → Arriaga."],links:[["Ruta a pie",dir(["bellas","gugg","arriaga"],"walking")]]},
+   {t:"20:00",k:"pnueva",p:"~30 €/pp",dur:"2 h",name:"Pintxos en Plaza Nueva y Siete Calles",blurb:"Cena de bar en bar por el Casco Viejo.",more:["Pide un txakoli o un zurito con cada pintxo.","Plaza Nueva tiene soportales: perfecta si llueve."],links:[["Ver en mapa",pin("pnueva")]]}
+  ]},
+ {id:"d2",date:"Dom 6",title:"Guggenheim y Artxanda",km:0,drive:"0 h",walk:"~8 km",
+  intro:"Día sin coche: el Guggenheim por la mañana y el atardecer sobre Bilbao desde Artxanda.",
+  chips:[["🚗 0 km",""],["🚶 8 km","green"],["🌅 Atardecer 17:52","sun"]],
+  mode:"walking",route:["hotel","gugg","salve","funi","artx","funi","cated"],
+  legs:[["Hotel → Guggenheim","1,2 km · 15 min"],["Guggenheim → funicular (por la ría)","1,2 km · 15 min"],["Funicular hasta Artxanda","3 min"],["Funicular → Casco Viejo","1,3 km · 18 min"]],
+  stops:[
+   {t:"10:00",k:"gugg",p:"18 €/pp",dur:"3 h",name:"Museo Guggenheim",blurb:"Ve el domingo: el lunes suele cerrar.",more:["Compra la entrada online con hora.","No te pierdas «La materia del tiempo» de Richard Serra.","La audioguía está incluida."],links:[["Entradas","https://www.guggenheim-bilbao.eus"],["A pie desde el hotel",dir(["hotel","gugg"],"walking")]]},
+   {t:"13:15",k:"salve",p:"Gratis",dur:"30 min",name:"Puppy, Maman y La Salve",blurb:"El exterior del museo y las mejores fotos.",more:["La araña Maman está en la parte de la ría.","Desde el puente de La Salve tienes la panorámica del edificio."],links:[["Ver en mapa",pin("salve")]]},
+   {t:"14:00",k:"gugg",p:"~25 €/pp",dur:"1 h 30",name:"Comida por Abando o Indautxu",blurb:"Menú o pintxos calientes.",more:["Es domingo festivo: reserva o ve pronto."],links:[]},
+   {t:"16:30",k:"funi",p:"6 € i/v pp",dur:"2 h",name:"Funicular de Artxanda",blurb:"La mejor vista de Bilbao al atardecer (~17:52).",sunset:true,more:["Sale de la Plaza del Funicular, aproximadamente cada 15 min.","Arriba hay un mirador y paseos por el monte. Abrígate."],links:[["Ruta a pie",dir(["gugg","funi"],"walking")],["Mirador",pin("artx")]]},
+   {t:"19:30",k:"cated",p:"~30 €/pp",dur:"2 h",name:"Casco Viejo y catedral de Santiago",blurb:"Ambiente navideño y cena.",more:["Pasa por fuera del Mercado de la Ribera.","Calles Somera, Artekale y Tendería."],links:[["Ver en mapa",pin("cated")]]}
+  ]},
+ {id:"d3",date:"Lun 7",title:"Gaztelugatxe y Urdaibai",km:122,drive:"~2 h 30",walk:"~7 km",
+  intro:"Amanecer en la ermita sin reserva, costa y Urdaibai, y la puesta de sol frente al islote.",
+  chips:[["🚗 122 km",""],["⏱️ 2 h 30",""],["🌄 Amanecer 8:35","sun"],["🌅 Atardecer 17:52","sun"]],
+  mode:"driving",route:["hotel","gaz","matx","bermeo","mundaka","gernika","mirador","hotel"],
+  legs:[["Bilbao → Gaztelugatxe","35 km · 45 min"],["Gaztelugatxe → Matxitxako","5 km · 8 min"],["Matxitxako → Bermeo","6 km · 10 min"],["Bermeo → Mundaka","4 km · 8 min"],["Mundaka → Gernika","12 km · 15 min"],["Gernika → Mirador de Gaztelugatxe","25 km · 30 min"],["Mirador → Bilbao","35 km · 45 min"]],
+  stops:[
+   {t:"07:30",k:"hotel",name:"Salida de Bilbao",blurb:"Desayuno rápido y en marcha.",more:["Lleva frontal, ropa de abrigo y calzado con agarre."],links:[["Ruta en coche",dir(["hotel","gaz"])]]},
+   {t:"08:15",k:"gaz",p:"Gratis · sin reserva",dur:"1 h 45",sunset:true,name:"Amanecer en la ermita",blurb:"Antes de las 10:00 no hay control de acceso. Amanece hacia las 8:35.",more:["Aparca en Urizarreta (junto al Eneperi): a esa hora hay sitio.","Bajada de 1,2 km y 241 escalones: unos 30–40 min.","Toca la campana tres veces y pide un deseo 🔔.","Sal antes de las 10:00, cuando empieza el control."],links:[["Ver en mapa",pin("gaz")],["Alternativas",'#gaztelugatxe']]},
+   {t:"10:15",k:"matx",p:"Gratis",dur:"45 min",name:"Cabo Matxitxako",blurb:"Faro y acantilados: el punto más al norte de Bizkaia.",more:["Vista de Gaztelugatxe desde arriba con la luz de la mañana."],links:[["Ruta en coche",dir(["gaz","matx"])]]},
+   {t:"11:15",k:"bermeo",p:"Aperitivo ~8 €/pp",dur:"1 h",name:"Bermeo",blurb:"Puerto Viejo de casas de colores.",more:["Paseo por el puerto pesquero y un café o un txakoli."],links:[["Ver en mapa",pin("bermeo")]]},
+   {t:"12:30",k:"mundaka",p:"Gratis",dur:"45 min",name:"Mundaka y Urdaibai",blurb:"Miradores sobre la ría y la isla de Izaro.",more:["Sube a la ermita de Santa Catalina.","Reserva de la Biosfera de Urdaibai."],links:[["Ruta en coche",dir(["bermeo","mundaka"])]]},
+   {t:"13:30",k:"gernika",p:"~30 €/pp · Museo 6,5 €",dur:"2 h 30",name:"Gernika: comida y visita",blurb:"Casa de Juntas, el árbol de Gernika y el Museo de la Paz.",more:["Comida en el centro y después la Casa de Juntas.","Museo de la Paz: entrada general de 6,5 €. Consulta el horario de invierno de los lunes.","Mural del Guernica en la calle Allende Salazar."],links:[["Ruta en coche",dir(["mundaka","gernika"])],["Museo de la Paz","https://www.museodelapaz.eus"]]},
+   {t:"16:45",k:"mirador",p:"Gratis",dur:"1 h 15",sunset:true,name:"Puesta de sol frente al islote",blurb:"Desde el mirador o la terraza del Eneperi, sin reserva. Atardecer hacia las 17:52.",more:["Foto clásica: el puente de piedra con la ermita al fondo.","Si la Diputación confirma acceso libre después de las 17:00, baja a la ermita.","Trípode y filtros ND para el mar en movimiento."],links:[["Ruta en coche",dir(["gernika","mirador"])],["Ver en mapa",pin("mirador")]]},
+   {t:"18:30",k:"hotel",p:"~30 €/pp",name:"Vuelta a Bilbao y cena",blurb:"Unos 45 min en coche.",more:["Alternativa: cenar en Bakio antes de volver."],links:[["Ruta en coche",dir(["mirador","hotel"])]]}
+  ]},
+ {id:"d4",date:"Mar 8",title:"Puente Colgante y vuelta",km:505,drive:"~5 h 30",walk:"~4 km",
+  intro:"Mañana en la costa de Getxo y vuelta a Tarragona.",
+  chips:[["🚗 505 km",""],["⏱️ 5 h 30",""],["🏛️ UNESCO",""]],
+  mode:"driving",route:["hotel","colg","algorta","tgn"],
+  legs:[["Bilbao → Puente Colgante","15 km · 20 min"],["Las Arenas → Algorta (a pie)","3 km · 40 min"],["Getxo → Tarragona","~490 km · 5 h"]],
+  stops:[
+   {t:"09:30",k:"colg",p:"Pasarela ~10 €/pp",dur:"1 h",name:"Puente Colgante",blurb:"Patrimonio de la UNESCO: barquilla o pasarela a 45 m de altura.",more:["Es el puente transbordador más antiguo del mundo (1893).","La entrada a la pasarela incluye un viaje en la barquilla."],links:[["Web oficial","https://puente-colgante.com"],["Ruta en coche",dir(["hotel","colg"])]]},
+   {t:"10:30",k:"algorta",p:"Gratis",dur:"1 h 30",name:"Paseo de Las Arenas a Algorta",blurb:"Casonas frente al mar y el Puerto Viejo.",more:["Café en el Puerto Viejo antes de salir."],links:[["Ruta a pie",dir(["colg","algorta"],"walking")]]},
+   {t:"12:30",k:"tgn",p:"Gasolina ~60 €",dur:"5 h",name:"Salida hacia Tarragona",blurb:"Comida por el camino; llegada hacia las 18:30.",more:["Último día del puente: puede haber retenciones.","Para comer, la zona de Logroño o Tudela."],links:[["Ruta en Google Maps",dir(["algorta","tgn"])]]}
+  ]}
+];
+
+/* ---------- NAVEGACIÓN ENTRE VISTAS ---------- */
+const VIEWS=['itinerario','gaztelugatxe','presupuesto','hotel','preparativos'];
+function showView(v){
+  if(!VIEWS.includes(v)) v='itinerario';
+  document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));
+  document.querySelectorAll('nav.views a').forEach(a=>a.classList.toggle('on',a.dataset.v===v));
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(v==='itinerario') initMap(curDay);
+  if(v==='presupuesto') document.querySelectorAll('#bars .bar i').forEach(b=>b.style.width=b.dataset.w+'%');
+}
+window.addEventListener('hashchange',()=>showView(location.hash.slice(1)));
+
+/* ---------- ITINERARIO ---------- */
+const tabs=document.getElementById('tabs'), daysEl=document.getElementById('days');
+const maps={}; let curDay=0;
+DAYS.forEach((d,i)=>{
+  const tb=document.createElement('button');
+  tb.className='tab'+(i===0?' on':'');
+  tb.innerHTML=`<div class="d">${d.date} dic</div><div class="t">${d.title}</div><div class="k">🚗 ${d.km} km · 🚶 ${d.walk}</div>`;
+  tb.onclick=()=>showDay(i);
+  tabs.appendChild(tb);
+  const stopsHtml=d.stops.map(s=>`
+    <li class="stop${s.sunset?' sunset':''}" data-k="${s.k}">
+      <div class="time">${s.t}</div><span class="dot"></span>
+      <div class="body">
+        <div class="name"><span>${s.name}${s.p?`<span class="price">${s.p}</span>`:''}</span><small>${s.dur||''}</small></div>
+        <div class="blurb">${s.blurb}</div>
+        <div class="more"><ul>${s.more.map(m=>`<li>${m}</li>`).join('')}</ul>
+          <div class="links">${s.links.map(l=>`<a href="${l[1]}" ${l[1].startsWith('#')?'':'target="_blank" rel="noopener"'}>${l[0]} ${l[1].startsWith('#')?'→':'↗'}</a>`).join('')}</div>
+        </div>
+      </div>
+    </li>`).join('');
+  const sec=document.createElement('div');
+  sec.className='day'+(i===0?' on':''); sec.id=d.id;
+  sec.innerHTML=`
+    <div class="day-grid">
+      <div class="card">
+        <div class="day-head"><h3>${d.date} dic · ${d.title}</h3><p>${d.intro}</p></div>
+        <div class="chips">${d.chips.map(c=>`<span class="chip ${c[1]}">${c[0]}</span>`).join('')}</div>
+        <div class="scroll"><ul class="timeline">${stopsHtml}</ul></div>
+      </div>
+      <div class="card">
+        <div class="map" id="map-${d.id}"></div>
+        <div class="legs"><table>${d.legs.map(l=>`<tr><td>${l[0]}</td><td>${l[1]}</td></tr>`).join('')}
+          <tr class="total"><td>Total en coche</td><td>${d.km} km · ${d.drive}</td></tr></table>
+          <a class="btn sea" target="_blank" rel="noopener" href="${dir(d.route,d.mode)}">🧭 Ruta completa en Google Maps</a>
+        </div>
+      </div>
+    </div>`;
+  daysEl.appendChild(sec);
+});
+
+function initMap(i){
+  const d=DAYS[i];
+  if(typeof L==='undefined') return;
+  if(maps[d.id]){ setTimeout(()=>maps[d.id].m.invalidateSize(),60); return; }
+  const m=L.map('map-'+d.id,{scrollWheelZoom:false});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'}).addTo(m);
+  const keys=[...new Set(d.stops.map(s=>s.k).concat(d.route))].filter(k=>k!=='tgn');
+  const markers={};
+  keys.forEach(k=>{
+    const sun=d.stops.find(s=>s.k===k&&s.sunset);
+    const icon=L.divIcon({className:'',html:`<div style="width:18px;height:18px;border-radius:50%;background:${sun?'#e8743b':'#0f5c6e'};border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)"></div>`,iconSize:[18,18],iconAnchor:[9,9]});
+    markers[k]=L.marker(P[k].c,{icon}).addTo(m).bindPopup(`<b>${P[k].n}</b><br><a href="${pin(k)}" target="_blank">Google Maps ↗</a>`);
+  });
+  const line=d.route.filter(k=>k!=='tgn').map(k=>P[k].c);
+  if(line.length>1) L.polyline(line,{color:d.mode==='walking'?'#3f7d4e':'#e8743b',weight:4,dashArray:'8 8',opacity:.85}).addTo(m);
+  m.fitBounds(L.latLngBounds(keys.map(k=>P[k].c)).pad(0.25));
+  maps[d.id]={m,markers};
+  setTimeout(()=>m.invalidateSize(),60);
+}
+function showDay(i){
+  curDay=i;
+  document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('on',i===j));
+  document.querySelectorAll('.day').forEach((t,j)=>t.classList.toggle('on',i===j));
+  initMap(i);
+}
+document.addEventListener('click',e=>{
+  const st=e.target.closest('.stop');
+  if(!st||e.target.closest('a')) return;
+  const was=st.classList.contains('open');
+  st.parentElement.querySelectorAll('.stop').forEach(s=>s.classList.remove('open'));
+  if(!was) st.classList.add('open');
+  const mm=maps[st.closest('.day').id];
+  if(mm&&mm.markers[st.dataset.k]){ mm.m.flyTo(P[st.dataset.k].c,14,{duration:.8}); mm.markers[st.dataset.k].openPopup(); }
+});
+document.querySelectorAll('.plan').forEach(p=>p.addEventListener('click',()=>p.classList.toggle('open')));
+
+/* ---------- CUENTA ATRÁS ---------- */
+const target=new Date('2026-12-07T17:52:00+01:00');
+function tick(){
+  let s=Math.max(0,(target-new Date())/1000);
+  const d=Math.floor(s/86400); s-=d*86400; const h=Math.floor(s/3600); s-=h*3600; const m=Math.floor(s/60);
+  document.getElementById('countdown').innerHTML=`<div><b>${d}</b><span>días</span></div><div><b>${h}</b><span>horas</span></div><div><b>${m}</b><span>min</span></div>`;
+}
+tick(); setInterval(tick,30000);
+
+/* ---------- CORREO ---------- */
+const MAIL_TO='gaztelugatxe@bizkaia.eus';
+const MAIL_SUBJ='Gaztelugatxe del 5 al 8 de diciembre: ¿alguna posibilidad?';
+const MAIL_BODY=`¡Hola!
+
+Mi pareja y yo vamos a Bizkaia en el puente de diciembre, del 5 al 8, y la verdad es que Gaztelugatxe es la razón principal del viaje. Venimos desde Tarragona con muchísimas ganas.
+
+Me dedico a la fotografía de paisaje (podéis ver mi trabajo en Instagram, @livetgn) y hace años que sueño con fotografiar la ermita al atardecer, con el islote recortado contra el mar. Para mí sería una de esas fotos que llevas mucho tiempo esperando hacer.
+
+El problema es que, a un mes vista, vemos que el aforo está completo los cuatro días. ¿Hay alguna forma de poder visitarlo? Por ejemplo, si se liberan plazas por cancelaciones o si se puede entrar fuera del horario de control.
+
+Nos adaptamos a cualquier día y hora de esas fechas y, por supuesto, respetaremos todas las normas del espacio.
+
+¡Muchísimas gracias por vuestra ayuda!
+
+Un saludo,
+[Tu nombre]`;
+document.getElementById('mailText').textContent=`Asunto: ${MAIL_SUBJ}\n\n${MAIL_BODY}`;
+document.getElementById('mailto').href=`mailto:${MAIL_TO}?subject=${encodeURIComponent(MAIL_SUBJ)}&body=${encodeURIComponent(MAIL_BODY)}`;
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1800);}
+document.getElementById('copyMail').onclick=async()=>{
+  const txt=`${MAIL_SUBJ}\n\n${MAIL_BODY}`;
+  try{ await navigator.clipboard.writeText(txt); toast('Texto copiado ✓'); }
+  catch(e){ const r=document.createRange(); r.selectNodeContents(document.getElementById('mailText')); const s=getSelection(); s.removeAllRanges(); s.addRange(r); toast('Texto seleccionado: cópialo con Ctrl+C'); }
+};
+
+/* ---------- PRESUPUESTO ---------- */
+const B={hotel:'ibis',food:1,fuel:'g',cat:'Todo'};
+const HOT={ibis:{n:'ibis Bilbao Centro',noche:125,park:11},gran:{n:'Hotel Gran Bilbao',noche:145,park:17}};
+const FUEL={g:{n:'gasolina 95',l:1.67,c:6.5},d:{n:'diésel',l:1.86,c:5.5}};
+const CATC={'Coche':'#0f5c6e','Alojamiento':'#1b8a9b','Entradas':'#3f7d4e','Comida':'#e8743b'};
+const rN=document.getElementById('rNoche'), rC=document.getElementById('rCons'), rL=document.getElementById('rLitro');
+rN.value=HOT.ibis.noche; rL.value=FUEL.g.l;
+const eur=v=>Math.round(v).toLocaleString('es-ES')+' €';
+const eur1=v=>(Math.round(v*100)/100).toLocaleString('es-ES',{maximumFractionDigits:2})+' €';
+function seg(id,key,cb){
+  document.getElementById(id).addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b) return;
+    [...b.parentElement.children].forEach(x=>x.classList.toggle('on',x===b));
+    B[key]=isNaN(+b.dataset.v)?b.dataset.v:+b.dataset.v; if(cb) cb(); calc();
+  });
+}
+seg('segHotel','hotel',()=>{rN.value=HOT[B.hotel].noche;});
+seg('segFood','food');
+seg('segFuel','fuel',()=>{rL.value=FUEL[B.fuel].l; rC.value=FUEL[B.fuel].c;});
+[rN,rC,rL].forEach(r=>r.addEventListener('input',calc));
+const btabs=document.getElementById('btabs');
+['Todo','Coche','Alojamiento','Entradas','Comida'].forEach(c=>btabs.insertAdjacentHTML('beforeend',`<button class="${c==='Todo'?'on':''}" data-c="${c}">${c}</button>`));
+btabs.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;[...btabs.children].forEach(x=>x.classList.toggle('on',x===b));B.cat=b.dataset.c;calc();});
+
+const KM=DAYS.reduce((a,d)=>a+d.km,0);
+document.getElementById('statKm').textContent='~'+KM.toLocaleString('es-ES');
+const maxKm=Math.max(...DAYS.map(d=>d.km));
+DAYS.forEach(d=>document.getElementById('bars').insertAdjacentHTML('beforeend',`<div class="bar-row"><b>${d.date}</b><div class="bar"><i data-w="${d.km/maxKm*100}"></i></div><span>${d.km} km</span></div>`));
+
+function calc(){
+  const H=HOT[B.hotel], noche=+rN.value, cons=+rC.value, litro=+rL.value, f=B.food;
+  document.getElementById('vNoche').textContent=noche+' €';
+  document.getElementById('vCons').textContent=cons.toFixed(1)+' l/100 km';
+  document.getElementById('vLitro').textContent=litro.toFixed(2).replace('.',',')+' €/l';
+  const litros=KM*cons/100;
+  const rows=[
+   ['Coche','Combustible',`${KM.toLocaleString('es-ES')} km · ${litros.toFixed(0)} l de ${FUEL[B.fuel].n}`,litros*litro,'shared'],
+   ['Coche','Peajes','AP-68: tramo estatal gratis desde el 11/11/2026; los tramos vascos siguen de pago',25,'shared',true],
+   ['Coche','Parking del hotel',`3 noches × ${H.park} €`,H.park*3,'shared'],
+   ['Coche','Parkings en la costa','Gaztelugatxe, Gernika, Bermeo y Getxo',10,'shared',true],
+   ['Alojamiento',H.n,`3 noches × ${noche} € (doble)`,noche*3,'shared',true],
+   ['Entradas','Museo Guggenheim','Entrada general',18,'pp'],
+   ['Entradas','Museo de Bellas Artes','Gratis',0,'pp'],
+   ['Entradas','Funicular de Artxanda','Ida y vuelta',6,'pp'],
+   ['Entradas','Museo de la Paz (Gernika)','Entrada general 2026',6.5,'pp'],
+   ['Entradas','San Juan de Gaztelugatxe','Gratis',0,'pp'],
+   ['Entradas','Puente Colgante','Pasarela (incluye la barquilla)',10,'pp',true],
+   ['Comida','Desayunos','4 × café y pintxo (~6 €)',24*f,'pp',true],
+   ['Comida','Comidas','Ruta, menú del domingo, Gernika, ruta',93*f,'pp',true],
+   ['Comida','Cenas','3 noches de pintxos (~30 €)',90*f,'pp',true],
+   ['Comida','Extras','Aperitivo en Bermeo, cafés, txakoli',15*f,'pp',true]
+  ];
+  let pp=0,two=0,html='',byCat={};
+  rows.forEach(([c,n,det,v,t,est])=>{
+    const vPP=t==='pp'?v:v/2, vTwo=t==='pp'?v*2:v;
+    pp+=vPP; two+=vTwo; byCat[c]=(byCat[c]||0)+vTwo;
+    if(B.cat!=='Todo'&&B.cat!==c) return;
+    html+=`<tr><td><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${CATC[c]};margin-right:6px"></i>${n}${est?'<span class="tag-est">estimado</span>':''}<small>${det}</small></td><td>${vPP?eur1(vPP):'Gratis'}</td><td>${vTwo?eur(vTwo):'Gratis'}</td></tr>`;
+  });
+  if(B.cat!=='Todo'){ const s=byCat[B.cat]; html+=`<tr class="sum"><td>Subtotal ${B.cat.toLowerCase()}</td><td>${eur(s/2)}</td><td>${eur(s)}</td></tr>`; }
+  else html+=`<tr class="sum"><td>Total</td><td>${eur(pp)}</td><td>${eur(two)}</td></tr>`;
+  document.getElementById('bBody').innerHTML=html;
+  document.getElementById('tPP').textContent=eur(pp);
+  document.getElementById('tTwo').textContent=eur(two);
+  document.getElementById('statPP').textContent='~'+eur(pp);
+  // donut
+  let acc=0, svg='<circle cx="21" cy="21" r="15.9" fill="none" stroke="#ebe3d6" stroke-width="6"/>';
+  Object.entries(byCat).forEach(([c,v])=>{
+    const pct=v/two*100;
+    svg+=`<circle cx="21" cy="21" r="15.9" fill="none" stroke="${CATC[c]}" stroke-width="6" stroke-dasharray="${pct} ${100-pct}" stroke-dashoffset="${25-acc}"/>`;
+    acc+=pct;
+  });
+  svg+=`<text x="21" y="22.5" text-anchor="middle" font-size="5" font-weight="700" fill="#14212b" font-family="Inter">${eur(two)}</text>`;
+  document.getElementById('donut').innerHTML=svg;
+  document.getElementById('legend').innerHTML=Object.entries(byCat).map(([c,v])=>`<div><i style="background:${CATC[c]}"></i>${c}: <b>${eur(v)}</b> (${Math.round(v/two*100)}%)</div>`).join('');
+}
+calc();
+
+/* ---------- PREPARATIVOS ---------- */
+const ITEMS=["Reservar hotel con cancelación gratuita","Enviar el correo a Gaztelugatxe","Revisar cancelaciones en la web de reservas","Comprar entradas del Guggenheim (domingo 6)","Revisar el coche: neumáticos, aceite y luces","Mirar el tiempo en Euskalmet","Frontal o linterna para el amanecer","Trípode, filtros ND y baterías de repuesto","Calzado con buen agarre y chubasquero","Ropa de abrigo: en la costa sopla","Algo de efectivo para pintxos"];
+const KEY='bilbao-checklist-2026b'; let saved={};
+try{ saved=JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){}
+const ul=document.getElementById('check');
+ITEMS.forEach((t,i)=>ul.insertAdjacentHTML('beforeend',`<li><label><input type="checkbox" data-i="${i}" ${saved[i]?'checked':''}><span>${t}</span></label></li>`));
+function prog(){ const cb=[...ul.querySelectorAll('input')], n=cb.filter(c=>c.checked).length;
+  document.getElementById('progText').textContent=`${n} de ${cb.length} tareas hechas`;
+  document.getElementById('progBar').style.width=(n/cb.length*100)+'%'; }
+ul.addEventListener('change',e=>{ saved[e.target.dataset.i]=e.target.checked; try{localStorage.setItem(KEY,JSON.stringify(saved));}catch(err){} prog(); });
+prog();
+
+const TIPS=[
+ ["🌄 Gaztelugatxe al amanecer","Antes de las 10:00 no hay control de acceso. Llega hacia las 8:15 y lleva frontal: la bajada son 1,2 km y 241 escalones."],
+ ["🌊 Ojo al tiempo","El camino puede cerrarse por temporal. Consulta Euskalmet la víspera; si el lunes viene mal, cambia el día de costa con el domingo."],
+ ["🅿️ Aparcar en la costa","Hay pocas plazas (22 en Urizarreta y 57 en Lurgorri). Por la mañana temprano y a última hora de la tarde hay sitio."],
+ ["🏛️ Museos","Guggenheim: martes a domingo (el lunes suele cerrar), compra online. Bellas Artes: gratis, cierra los martes y el domingo a las 15:00."],
+ ["🥘 Pintxos","Plaza Nueva y las Siete Calles. En el puente se llena: ve pronto (19:30–20:00) y muévete de bar en bar."],
+ ["🚗 Carretera","El tramo estatal de la AP-68 es gratis desde el 11/11/2026; los tramos vascos siguen de pago. Es operación salida: sal pronto."]
+];
+document.getElementById('acc').innerHTML=TIPS.map((t,i)=>`<div class="acc${i===0?' open':''}"><button>${t[0]}</button><div>${t[1]}</div></div>`).join('');
+document.getElementById('acc').addEventListener('click',e=>{const b=e.target.closest('button');if(b)b.parentElement.classList.toggle('open');});
+const LINKS=[["Gaztelugatxe · reservas","https://www.bizkaia.eus/es/gaztelugatxe"],["Museo Guggenheim","https://www.guggenheim-bilbao.eus"],["Bellas Artes","https://www.museobilbao.com"],["Euskalmet · tiempo","https://www.euskalmet.euskadi.eus"],["Bilbao Turismo","https://www.bilbaoturismo.net"],["Puente Colgante","https://puente-colgante.com"],["Museo de la Paz","https://www.museodelapaz.eus"],["DGT · tráfico","https://www.dgt.es/conoce-el-estado-del-trafico/"]];
+document.getElementById('links').innerHTML=LINKS.map(l=>`<a href="${l[1]}" target="_blank" rel="noopener">${l[0]}<span>↗</span></a>`).join('');
+
+/* ---------- INICIO ---------- */
+window.addEventListener('load',()=>showView(location.hash.slice(1)||'itinerario'));
+</script>
+</body>
+</html>
