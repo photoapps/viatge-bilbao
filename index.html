@@ -256,7 +256,7 @@ footer{text-align:center;color:var(--muted);font-size:.78rem;padding:10px 16px 3
 <section class="view" id="v-itinerario">
   <div class="banner">
     <span style="font-size:1.4rem">🌅</span>
-    <div class="grow"><b>Gaztelugatxe: aforo completo del 5 al 8.</b> El lunes está planteado con el amanecer en la ermita (sin reserva antes de las 10:00) y la puesta de sol desde el mirador.</div>
+    <div class="grow"><b>Plan de paisaje:</b> flysch de Barrika y Zumaia, Gaztelugatxe, Elantxobe y la cascada de Gujuli. Bilbao es la base para dormir, ver el Guggenheim y cenar pintxos. Gaztelugatxe tiene el aforo completo, así que se visita al amanecer, sin reserva.</div>
     <a class="btn ghost" href="#gaztelugatxe">Ver alternativas</a>
   </div>
   <div class="tabs" id="tabs"></div>
@@ -404,22 +404,21 @@ footer{text-align:center;color:var(--muted);font-size:.78rem;padding:10px 16px 3
 const P = {
   tgn:{n:"Tarragona",c:[41.1189,1.2445]},
   hotel:{n:"ibis Bilbao Centro",c:[43.257839,-2.935667]},
-  bellas:{n:"Museo de Bellas Artes",c:[43.2647,-2.9377]},
-  arriaga:{n:"Teatro Arriaga",c:[43.2596,-2.9248]},
-  pnueva:{n:"Plaza Nueva",c:[43.2593,-2.9231]},
   gugg:{n:"Museo Guggenheim",c:[43.2687,-2.9340]},
-  salve:{n:"Puente de La Salve",c:[43.2672,-2.9310]},
-  funi:{n:"Funicular de Artxanda",c:[43.2687,-2.9254]},
-  artx:{n:"Mirador de Artxanda",c:[43.2745,-2.9248]},
-  cated:{n:"Catedral de Santiago",c:[43.2573,-2.9237]},
-  gernika:{n:"Gernika · Casa de Juntas",c:[43.3135,-2.6795]},
-  mundaka:{n:"Mundaka",c:[43.4075,-2.6985]},
-  bermeo:{n:"Bermeo · puerto",c:[43.4205,-2.7225]},
-  matx:{n:"Cabo Matxitxako",c:[43.4545,-2.7520]},
+  pnueva:{n:"Plaza Nueva · pintxos",c:[43.2593,-2.9231]},
+  colg:{n:"Puente Colgante",c:[43.3230,-3.0170]},
+  algorta:{n:"Puerto Viejo de Algorta",c:[43.3510,-3.0110]},
+  galea:{n:"Acantilados de Punta Galea",c:[43.3745,-3.0335]},
+  barrika:{n:"Flysch de Barrika",c:[43.4070,-2.9625]},
+  zumaia:{n:"Zumaia · Itzurun y San Telmo",c:[43.3008,-2.2600]},
   gaz:{n:"Ermita de San Juan de Gaztelugatxe",c:[43.4470,-2.7845]},
   mirador:{n:"Mirador de Gaztelugatxe / Eneperi",c:[43.4433,-2.7810]},
-  colg:{n:"Puente Colgante",c:[43.3230,-3.0170]},
-  algorta:{n:"Puerto Viejo de Algorta",c:[43.3510,-3.0110]}
+  matx:{n:"Cabo Matxitxako",c:[43.4545,-2.7520]},
+  bermeo:{n:"Bermeo · Puerto Viejo",c:[43.4205,-2.7225]},
+  mundaka:{n:"Mundaka",c:[43.4075,-2.6985]},
+  elantxobe:{n:"Elantxobe",c:[43.4035,-2.6380]},
+  laga:{n:"Playa de Laga y Ogoño",c:[43.4125,-2.6550]},
+  gujuli:{n:"Cascada de Gujuli",c:[43.0110,-2.8110]}
 };
 const gq = k => encodeURIComponent(P[k].c.join(','));
 const dir = (pts,mode='driving') => {
@@ -427,57 +426,59 @@ const dir = (pts,mode='driving') => {
   return `https://www.google.com/maps/dir/?api=1&origin=${gq(o)}&destination=${gq(d)}${w.length?'&waypoints='+w.map(gq).join('%7C'):''}&travelmode=${mode}`;
 };
 const pin = k => `https://www.google.com/maps/search/?api=1&query=${gq(k)}`;
+const MAREAS = "https://tablademareas.com/es/pais-vasco";
 
 /* ---------- DÍAS ---------- */
 const DAYS = [
- {id:"d1",date:"Sáb 5",title:"Llegada y Bilbao",km:478,drive:"~4 h 45",walk:"~4 km",
-  intro:"Viaje desde Tarragona, check-in, arte gratis en Bellas Artes y primera noche de pintxos.",
-  chips:[["🚗 478 km",""],["⏱️ 4 h 45",""],["🚶 4 km","green"]],
-  mode:"driving",route:["tgn","hotel"],
-  legs:[["Tarragona → Bilbao (AP-2 + AP-68)","475 km · 4 h 45"],["Hotel → Bellas Artes (a pie)","0,9 km · 12 min"],["Bellas Artes → Arriaga (por la ría)","1,8 km · 25 min"],["Arriaga → Plaza Nueva","0,2 km · 3 min"]],
+ {id:"d1",date:"Sáb 5",title:"Costa de Getxo y Barrika",km:530,drive:"~5 h 40",walk:"~5 km",
+  intro:"Llegada, Puente Colgante, acantilados de Getxo y primera puesta de sol sobre el flysch de Barrika.",
+  chips:[["🚗 530 km",""],["⏱️ 5 h 40",""],["🪨 Flysch","green"],["🌅 Atardecer 17:52","sun"]],
+  mode:"driving",route:["tgn","hotel","colg","algorta","galea","barrika","hotel"],
+  legs:[["Tarragona → Bilbao (AP-2 + AP-68)","475 km · 4 h 45"],["Bilbao → Puente Colgante","15 km · 20 min"],["Puente Colgante → Algorta","4 km · 10 min"],["Algorta → Punta Galea","3 km · 8 min"],["Punta Galea → Barrika","12 km · 20 min"],["Barrika → Bilbao","22 km · 30 min"]],
   stops:[
-   {t:"08:30",k:"tgn",p:"Gasolina ~60 €",name:"Salida desde Tarragona",blurb:"Unos 475 km por AP-2 y AP-68.",more:["Parada a mitad de camino en Zaragoza o en la zona de Tudela/Alfaro.","Sal pronto: es la operación salida del puente."],links:[["Ruta en Google Maps",dir(["tgn","hotel"])]]},
-   {t:"14:00",k:"hotel",p:"Parking ~11 €/noche",dur:"30 min",name:"Check-in y aparcar",blurb:"El coche se queda en el parking hasta el lunes.",more:["Desde aquí todo el centro se hace a pie."],links:[["Ver en mapa",pin("hotel")]]},
-   {t:"16:00",k:"bellas",p:"Gratis",dur:"2 h",name:"Museo de Bellas Artes",blurb:"Entrada gratuita. El sábado abre hasta las 20:00.",more:["De El Greco y Goya a artistas vascos.","Junto al parque de Doña Casilda."],links:[["Web del museo","https://www.museobilbao.com"],["A pie desde el hotel",dir(["hotel","bellas"],"walking")]]},
-   {t:"18:30",k:"arriaga",dur:"45 min",name:"Paseo por la ría hasta el Arriaga",blurb:"La ría iluminada y el teatro neobarroco.",more:["Ruta: Bellas Artes → Guggenheim (por fuera, de noche) → Uribitarte → Arriaga."],links:[["Ruta a pie",dir(["bellas","gugg","arriaga"],"walking")]]},
-   {t:"20:00",k:"pnueva",p:"~30 €/pp",dur:"2 h",name:"Pintxos en Plaza Nueva y Siete Calles",blurb:"Cena de bar en bar por el Casco Viejo.",more:["Pide un txakoli o un zurito con cada pintxo.","Plaza Nueva tiene soportales: perfecta si llueve."],links:[["Ver en mapa",pin("pnueva")]]}
+   {t:"08:00",k:"tgn",p:"Gasolina ~60 €",name:"Salida desde Tarragona",blurb:"Unos 475 km por AP-2 y AP-68.",more:["Sal pronto: es la operación salida del puente.","Una parada corta en la zona de Zaragoza o Tudela."],links:[["Ruta en Google Maps",dir(["tgn","hotel"])]]},
+   {t:"13:15",k:"hotel",p:"~15 €/pp",dur:"1 h",name:"Check-in y comida rápida",blurb:"Dejáis las maletas y comida ligera por el centro.",more:["Si la habitación no está lista, deja el equipaje en recepción.","Hoy el coche se usa por la tarde."],links:[["Ver en mapa",pin("hotel")]]},
+   {t:"14:45",k:"colg",p:"Barquilla ~0,60 € · pasarela ~10 €",dur:"45 min",name:"Puente Colgante",blurb:"Patrimonio de la UNESCO, a 20 min de Bilbao.",more:["Puedes cruzar en la barquilla o subir a la pasarela, a 45 m de altura.","Buena foto desde el paseo de Portugalete con la estructura de hierro."],links:[["Web oficial","https://puente-colgante.com"],["Ruta en coche",dir(["hotel","colg"])]]},
+   {t:"15:45",k:"algorta",p:"Gratis",dur:"1 h",name:"Puerto Viejo de Algorta y Punta Galea",blurb:"Casitas de pescadores y acantilados sobre el Abra.",more:["Paseo corto por el Puerto Viejo.","En Punta Galea, un sendero llano junto al borde del acantilado, con el fuerte y el molino de Aixerrota."],links:[["Ruta en coche",dir(["colg","algorta","galea"])]]},
+   {t:"17:00",k:"barrika",p:"Gratis",dur:"1 h 15",sunset:true,name:"Puesta de sol en el flysch de Barrika",blurb:"Capas de roca que se meten en el mar y el sol cayendo sobre el Cantábrico.",more:["Se aparca encima de la playa y se baja por escaleras en unos 5 minutos.","Con marea baja quedan al descubierto las plataformas de flysch: consulta la tabla de mareas.","Trípode y ND para exposiciones largas sobre la roca.","Volverás de noche: lleva frontal para las escaleras."],links:[["Ruta en coche",dir(["galea","barrika"])],["Tabla de mareas",MAREAS]]},
+   {t:"19:15",k:"pnueva",p:"~30 €/pp",dur:"2 h",name:"Pintxos en Plaza Nueva y Siete Calles",blurb:"Vuelta a Bilbao y cena de bar en bar.",more:["Pide un txakoli o un zurito con cada pintxo."],links:[["Ruta en coche",dir(["barrika","hotel"])]]}
   ]},
- {id:"d2",date:"Dom 6",title:"Guggenheim y Artxanda",km:0,drive:"0 h",walk:"~8 km",
-  intro:"Día sin coche: el Guggenheim por la mañana y el atardecer sobre Bilbao desde Artxanda.",
-  chips:[["🚗 0 km",""],["🚶 8 km","green"],["🌅 Atardecer 17:52","sun"]],
-  mode:"walking",route:["hotel","gugg","salve","funi","artx","funi","cated"],
-  legs:[["Hotel → Guggenheim","1,2 km · 15 min"],["Guggenheim → funicular (por la ría)","1,2 km · 15 min"],["Funicular hasta Artxanda","3 min"],["Funicular → Casco Viejo","1,3 km · 18 min"]],
+ {id:"d2",date:"Dom 6",title:"Guggenheim y flysch de Zumaia",km:170,drive:"~2 h 15",walk:"~5 km",
+  intro:"Mañana de arte en el Guggenheim y tarde en el Geoparque de la Costa Vasca, con atardecer en San Telmo.",
+  chips:[["🚗 170 km",""],["⏱️ 2 h 15",""],["🏛️ Guggenheim",""],["🌅 Atardecer 17:50","sun"]],
+  mode:"driving",route:["hotel","zumaia","hotel"],
+  legs:[["Hotel → Guggenheim (a pie)","1,2 km · 15 min"],["Bilbao → Zumaia (AP-8)","85 km · 1 h"],["Zumaia → Bilbao","85 km · 1 h"]],
   stops:[
-   {t:"10:00",k:"gugg",p:"18 €/pp",dur:"3 h",name:"Museo Guggenheim",blurb:"Ve el domingo: el lunes suele cerrar.",more:["Compra la entrada online con hora.","No te pierdas «La materia del tiempo» de Richard Serra.","La audioguía está incluida."],links:[["Entradas","https://www.guggenheim-bilbao.eus"],["A pie desde el hotel",dir(["hotel","gugg"],"walking")]]},
-   {t:"13:15",k:"salve",p:"Gratis",dur:"30 min",name:"Puppy, Maman y La Salve",blurb:"El exterior del museo y las mejores fotos.",more:["La araña Maman está en la parte de la ría.","Desde el puente de La Salve tienes la panorámica del edificio."],links:[["Ver en mapa",pin("salve")]]},
-   {t:"14:00",k:"gugg",p:"~25 €/pp",dur:"1 h 30",name:"Comida por Abando o Indautxu",blurb:"Menú o pintxos calientes.",more:["Es domingo festivo: reserva o ve pronto."],links:[]},
-   {t:"16:30",k:"funi",p:"6 € i/v pp",dur:"2 h",name:"Funicular de Artxanda",blurb:"La mejor vista de Bilbao al atardecer (~17:52).",sunset:true,more:["Sale de la Plaza del Funicular, aproximadamente cada 15 min.","Arriba hay un mirador y paseos por el monte. Abrígate."],links:[["Ruta a pie",dir(["gugg","funi"],"walking")],["Mirador",pin("artx")]]},
-   {t:"19:30",k:"cated",p:"~30 €/pp",dur:"2 h",name:"Casco Viejo y catedral de Santiago",blurb:"Ambiente navideño y cena.",more:["Pasa por fuera del Mercado de la Ribera.","Calles Somera, Artekale y Tendería."],links:[["Ver en mapa",pin("cated")]]}
+   {t:"10:00",k:"gugg",p:"18 €/pp",dur:"2 h 30",name:"Museo Guggenheim",blurb:"Ve el domingo: el lunes suele cerrar.",more:["Compra la entrada online con hora.","No te pierdas «La materia del tiempo» de Richard Serra.","Al salir, Puppy y la araña Maman junto a la ría."],links:[["Entradas","https://www.guggenheim-bilbao.eus"],["A pie desde el hotel",dir(["hotel","gugg"],"walking")]]},
+   {t:"13:00",k:"zumaia",dur:"1 h",name:"En coche a Zumaia",blurb:"Unos 85 km por la AP-8.",more:["Es el único día que se sale de Bizkaia: Zumaia está en Gipuzkoa."],links:[["Ruta en coche",dir(["hotel","zumaia"])]]},
+   {t:"14:00",k:"zumaia",p:"~25 €/pp",dur:"1 h 15",name:"Comida en Zumaia",blurb:"Pescado o pintxos en el casco viejo.",more:["En domingo festivo conviene reservar."],links:[]},
+   {t:"15:30",k:"zumaia",p:"Gratis",dur:"2 h 45",sunset:true,name:"Flysch de Itzurun y ermita de San Telmo",blurb:"El paisaje más famoso del Geoparque: paredes de roca en capas verticales sobre el mar.",more:["La playa de Itzurun está en el mismo pueblo: se baja por escaleras desde el aparcamiento.","La ermita de San Telmo, sobre el acantilado, es el mirador clásico para la puesta de sol.","Con marea baja se camina por las plataformas de roca: consulta la tabla de mareas."],links:[["Ver en mapa",pin("zumaia")],["Tabla de mareas",MAREAS]]},
+   {t:"18:15",k:"hotel",p:"~30 €/pp",dur:"",name:"Vuelta a Bilbao y cena",blurb:"Una hora de coche y pintxos por el Casco Viejo.",more:["Alternativa: cenar en Zumaia o Getaria antes de volver."],links:[["Ruta en coche",dir(["zumaia","hotel"])]]}
   ]},
- {id:"d3",date:"Lun 7",title:"Gaztelugatxe y Urdaibai",km:122,drive:"~2 h 30",walk:"~7 km",
-  intro:"Amanecer en la ermita sin reserva, costa y Urdaibai, y la puesta de sol frente al islote.",
-  chips:[["🚗 122 km",""],["⏱️ 2 h 30",""],["🌄 Amanecer 8:35","sun"],["🌅 Atardecer 17:52","sun"]],
-  mode:"driving",route:["hotel","gaz","matx","bermeo","mundaka","gernika","mirador","hotel"],
-  legs:[["Bilbao → Gaztelugatxe","35 km · 45 min"],["Gaztelugatxe → Matxitxako","5 km · 8 min"],["Matxitxako → Bermeo","6 km · 10 min"],["Bermeo → Mundaka","4 km · 8 min"],["Mundaka → Gernika","12 km · 15 min"],["Gernika → Mirador de Gaztelugatxe","25 km · 30 min"],["Mirador → Bilbao","35 km · 45 min"]],
+ {id:"d3",date:"Lun 7",title:"Gaztelugatxe, Urdaibai y Elantxobe",km:160,drive:"~3 h",walk:"~7 km",
+  intro:"Amanecer en la ermita sin reserva, la costa de Urdaibai y la puesta de sol frente al islote.",
+  chips:[["🚗 160 km",""],["⏱️ 3 h",""],["🌄 Amanecer 8:35","sun"],["🌅 Atardecer 17:52","sun"]],
+  mode:"driving",route:["hotel","gaz","matx","bermeo","mundaka","elantxobe","laga","mirador","hotel"],
+  legs:[["Bilbao → Gaztelugatxe","35 km · 45 min"],["Gaztelugatxe → Matxitxako","5 km · 8 min"],["Matxitxako → Bermeo","6 km · 10 min"],["Bermeo → Mundaka","4 km · 8 min"],["Mundaka → Elantxobe (por Gernika)","30 km · 40 min"],["Elantxobe → Laga","5 km · 10 min"],["Laga → Mirador de Gaztelugatxe","40 km · 50 min"],["Mirador → Bilbao","35 km · 45 min"]],
   stops:[
    {t:"07:30",k:"hotel",name:"Salida de Bilbao",blurb:"Desayuno rápido y en marcha.",more:["Lleva frontal, ropa de abrigo y calzado con agarre."],links:[["Ruta en coche",dir(["hotel","gaz"])]]},
    {t:"08:15",k:"gaz",p:"Gratis · sin reserva",dur:"1 h 45",sunset:true,name:"Amanecer en la ermita",blurb:"Antes de las 10:00 no hay control de acceso. Amanece hacia las 8:35.",more:["Aparca en Urizarreta (junto al Eneperi): a esa hora hay sitio.","Bajada de 1,2 km y 241 escalones: unos 30–40 min.","Toca la campana tres veces y pide un deseo 🔔.","Sal antes de las 10:00, cuando empieza el control."],links:[["Ver en mapa",pin("gaz")],["Alternativas",'#gaztelugatxe']]},
-   {t:"10:15",k:"matx",p:"Gratis",dur:"45 min",name:"Cabo Matxitxako",blurb:"Faro y acantilados: el punto más al norte de Bizkaia.",more:["Vista de Gaztelugatxe desde arriba con la luz de la mañana."],links:[["Ruta en coche",dir(["gaz","matx"])]]},
-   {t:"11:15",k:"bermeo",p:"Aperitivo ~8 €/pp",dur:"1 h",name:"Bermeo",blurb:"Puerto Viejo de casas de colores.",more:["Paseo por el puerto pesquero y un café o un txakoli."],links:[["Ver en mapa",pin("bermeo")]]},
-   {t:"12:30",k:"mundaka",p:"Gratis",dur:"45 min",name:"Mundaka y Urdaibai",blurb:"Miradores sobre la ría y la isla de Izaro.",more:["Sube a la ermita de Santa Catalina.","Reserva de la Biosfera de Urdaibai."],links:[["Ruta en coche",dir(["bermeo","mundaka"])]]},
-   {t:"13:30",k:"gernika",p:"~30 €/pp · Museo 6,5 €",dur:"2 h 30",name:"Gernika: comida y visita",blurb:"Casa de Juntas, el árbol de Gernika y el Museo de la Paz.",more:["Comida en el centro y después la Casa de Juntas.","Museo de la Paz: entrada general de 6,5 €. Consulta el horario de invierno de los lunes.","Mural del Guernica en la calle Allende Salazar."],links:[["Ruta en coche",dir(["mundaka","gernika"])],["Museo de la Paz","https://www.museodelapaz.eus"]]},
-   {t:"16:45",k:"mirador",p:"Gratis",dur:"1 h 15",sunset:true,name:"Puesta de sol frente al islote",blurb:"Desde el mirador o la terraza del Eneperi, sin reserva. Atardecer hacia las 17:52.",more:["Foto clásica: el puente de piedra con la ermita al fondo.","Si la Diputación confirma acceso libre después de las 17:00, baja a la ermita.","Trípode y filtros ND para el mar en movimiento."],links:[["Ruta en coche",dir(["gernika","mirador"])],["Ver en mapa",pin("mirador")]]},
+   {t:"10:15",k:"matx",p:"Gratis",dur:"30 min",name:"Cabo Matxitxako",blurb:"Faro y acantilados: el punto más al norte de Bizkaia.",more:["Vista de Gaztelugatxe desde arriba con la luz de la mañana."],links:[["Ruta en coche",dir(["gaz","matx"])]]},
+   {t:"11:00",k:"bermeo",p:"Aperitivo ~8 €/pp",dur:"1 h 15",name:"Bermeo y Mundaka",blurb:"Puerto Viejo de colores y miradores sobre la ría de Urdaibai.",more:["En Bermeo, café o txakoli en el puerto.","En Mundaka, sube a la ermita de Santa Catalina: vista de la desembocadura y de la isla de Izaro."],links:[["Ruta en coche",dir(["matx","bermeo","mundaka"])]]},
+   {t:"13:00",k:"elantxobe",p:"~30 €/pp",dur:"1 h 45",name:"Elantxobe",blurb:"Pueblo pesquero colgado sobre el mar, al otro lado de la ría.",more:["Calles empinadas, el puerto y la plataforma giratoria de los autobuses.","Comida en el puerto con vistas al cabo Ogoño.","Se pasa por Gernika: si os apetece, para 15 min junto al árbol."],links:[["Ruta en coche",dir(["mundaka","elantxobe"])]]},
+   {t:"15:00",k:"laga",p:"Gratis",dur:"1 h",name:"Playa de Laga y Ogoño",blurb:"Arenal salvaje bajo la pared del Ogoño, frente a la isla de Izaro.",more:["Se aparca junto a la playa: paseo llano por la arena.","Gran foto de la playa entera desde la carretera de bajada."],links:[["Ruta en coche",dir(["elantxobe","laga"])]]},
+   {t:"16:50",k:"mirador",p:"Gratis",dur:"1 h 15",sunset:true,name:"Puesta de sol frente al islote",blurb:"Desde el mirador o la terraza del Eneperi, sin reserva. Atardecer hacia las 17:52.",more:["Foto clásica: el puente de piedra con la ermita al fondo.","Si la Diputación confirma acceso libre después de las 17:00, baja a la ermita.","Trípode y filtros ND para el mar en movimiento."],links:[["Ruta en coche",dir(["laga","mirador"])],["Ver en mapa",pin("mirador")]]},
    {t:"18:30",k:"hotel",p:"~30 €/pp",name:"Vuelta a Bilbao y cena",blurb:"Unos 45 min en coche.",more:["Alternativa: cenar en Bakio antes de volver."],links:[["Ruta en coche",dir(["mirador","hotel"])]]}
   ]},
- {id:"d4",date:"Mar 8",title:"Puente Colgante y vuelta",km:505,drive:"~5 h 30",walk:"~4 km",
-  intro:"Mañana en la costa de Getxo y vuelta a Tarragona.",
-  chips:[["🚗 505 km",""],["⏱️ 5 h 30",""],["🏛️ UNESCO",""]],
-  mode:"driving",route:["hotel","colg","algorta","tgn"],
-  legs:[["Bilbao → Puente Colgante","15 km · 20 min"],["Las Arenas → Algorta (a pie)","3 km · 40 min"],["Getxo → Tarragona","~490 km · 5 h"]],
+ {id:"d4",date:"Mar 8",title:"Cascada de Gujuli y vuelta",km:515,drive:"~5 h 30",walk:"~1 km",
+  intro:"Una cascada de 100 metros de camino a casa y vuelta a Tarragona.",
+  chips:[["🚗 515 km",""],["⏱️ 5 h 30",""],["💧 Cascada","green"]],
+  mode:"driving",route:["hotel","gujuli","tgn"],
+  legs:[["Bilbao → Cascada de Gujuli","40 km · 40 min"],["Gujuli → Tarragona (por Vitoria y AP-68)","~475 km · 4 h 50"]],
   stops:[
-   {t:"09:30",k:"colg",p:"Pasarela ~10 €/pp",dur:"1 h",name:"Puente Colgante",blurb:"Patrimonio de la UNESCO: barquilla o pasarela a 45 m de altura.",more:["Es el puente transbordador más antiguo del mundo (1893).","La entrada a la pasarela incluye un viaje en la barquilla."],links:[["Web oficial","https://puente-colgante.com"],["Ruta en coche",dir(["hotel","colg"])]]},
-   {t:"10:30",k:"algorta",p:"Gratis",dur:"1 h 30",name:"Paseo de Las Arenas a Algorta",blurb:"Casonas frente al mar y el Puerto Viejo.",more:["Café en el Puerto Viejo antes de salir."],links:[["Ruta a pie",dir(["colg","algorta"],"walking")]]},
-   {t:"12:30",k:"tgn",p:"Gasolina ~60 €",dur:"5 h",name:"Salida hacia Tarragona",blurb:"Comida por el camino; llegada hacia las 18:30.",more:["Último día del puente: puede haber retenciones.","Para comer, la zona de Logroño o Tudela."],links:[["Ruta en Google Maps",dir(["algorta","tgn"])]]}
+   {t:"09:00",k:"hotel",name:"Check-out y salida",blurb:"Rumbo sur, hacia Álava.",more:["Echa gasolina antes de salir de Bilbao."],links:[["Ruta en coche",dir(["hotel","gujuli"])]]},
+   {t:"09:45",k:"gujuli",p:"Gratis",dur:"1 h",name:"Cascada de Gujuli",blurb:"Un salto de unos 100 m a 5 minutos andando desde el aparcamiento.",more:["El mirador está junto al aparcamiento: acceso muy fácil.","En diciembre suele llevar agua, sobre todo si ha llovido los días anteriores.","Opcional (+1 h 30): el Salto del Nervión, desde Monte Santiago, con unos 2 km llanos hasta el mirador. Solo si no hay nieve y ha llovido."],links:[["Ver en mapa",pin("gujuli")]]},
+   {t:"11:00",k:"tgn",p:"Gasolina ~60 €",dur:"5 h",name:"Vuelta a Tarragona",blurb:"Comida por el camino; llegada hacia las 17:00.",more:["Último día del puente: puede haber retenciones.","Para comer, la zona de Logroño o Tudela."],links:[["Ruta en Google Maps",dir(["gujuli","tgn"])]]}
   ]}
 ];
 
@@ -641,18 +642,16 @@ function calc(){
   const litros=KM*cons/100;
   const rows=[
    ['Coche','Combustible',`${KM.toLocaleString('es-ES')} km · ${litros.toFixed(0)} l de ${FUEL[B.fuel].n}`,litros*litro,'shared'],
-   ['Coche','Peajes','AP-68: tramo estatal gratis desde el 11/11/2026; los tramos vascos siguen de pago',25,'shared',true],
+   ['Coche','Peajes','AP-68 (tramos vascos de pago) y AP-8 hasta Zumaia ida y vuelta',35,'shared',true],
    ['Coche','Parking del hotel',`3 noches × ${H.park} €`,H.park*3,'shared'],
-   ['Coche','Parkings en la costa','Gaztelugatxe, Gernika, Bermeo y Getxo',10,'shared',true],
+   ['Coche','Parkings en la costa','Getxo, Zumaia, Bermeo, Elantxobe…',15,'shared',true],
    ['Alojamiento',H.n,`3 noches × ${noche} € (doble)`,noche*3,'shared',true],
    ['Entradas','Museo Guggenheim','Entrada general',18,'pp'],
-   ['Entradas','Museo de Bellas Artes','Gratis',0,'pp'],
-   ['Entradas','Funicular de Artxanda','Ida y vuelta',6,'pp'],
-   ['Entradas','Museo de la Paz (Gernika)','Entrada general 2026',6.5,'pp'],
-   ['Entradas','San Juan de Gaztelugatxe','Gratis',0,'pp'],
+   ['Entradas','San Juan de Gaztelugatxe','Gratis (al amanecer, sin reserva)',0,'pp'],
+   ['Entradas','Flysch de Barrika y Zumaia, Laga, Gujuli','Espacios naturales: gratis',0,'pp'],
    ['Entradas','Puente Colgante','Pasarela (incluye la barquilla)',10,'pp',true],
    ['Comida','Desayunos','4 × café y pintxo (~6 €)',24*f,'pp',true],
-   ['Comida','Comidas','Ruta, menú del domingo, Gernika, ruta',93*f,'pp',true],
+   ['Comida','Comidas','Llegada, Zumaia, Elantxobe y de ruta',88*f,'pp',true],
    ['Comida','Cenas','3 noches de pintxos (~30 €)',90*f,'pp',true],
    ['Comida','Extras','Aperitivo en Bermeo, cafés, txakoli',15*f,'pp',true]
   ];
@@ -683,7 +682,7 @@ function calc(){
 calc();
 
 /* ---------- PREPARATIVOS ---------- */
-const ITEMS=["Reservar hotel con cancelación gratuita","Enviar el correo a Gaztelugatxe","Revisar cancelaciones en la web de reservas","Comprar entradas del Guggenheim (domingo 6)","Revisar el coche: neumáticos, aceite y luces","Mirar el tiempo en Euskalmet","Frontal o linterna para el amanecer","Trípode, filtros ND y baterías de repuesto","Calzado con buen agarre y chubasquero","Ropa de abrigo: en la costa sopla","Algo de efectivo para pintxos"];
+const ITEMS=["Reservar hotel con cancelación gratuita","Mirar la tabla de mareas para Barrika (sáb.) y Zumaia (dom.)","Enviar el correo a Gaztelugatxe","Revisar cancelaciones en la web de reservas","Comprar entradas del Guggenheim (domingo 6)","Revisar el coche: neumáticos, aceite y luces","Mirar el tiempo en Euskalmet","Frontal o linterna para el amanecer","Trípode, filtros ND y baterías de repuesto","Calzado con buen agarre y chubasquero","Ropa de abrigo: en la costa sopla","Algo de efectivo para pintxos"];
 const KEY='bilbao-checklist-2026b'; let saved={};
 try{ saved=JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){}
 const ul=document.getElementById('check');
@@ -695,16 +694,18 @@ ul.addEventListener('change',e=>{ saved[e.target.dataset.i]=e.target.checked; tr
 prog();
 
 const TIPS=[
+ ["🌊 Mareas y flysch","En Barrika y Zumaia, con marea baja se ven y se pisan las plataformas de roca. Con marea alta, mejor fotografiar desde arriba (escaleras o San Telmo). Consulta la tabla de mareas antes de ir."],
+ ["⏱️ Pocas horas de luz","En diciembre amanece hacia las 8:35 y anochece hacia las 17:52: unas 9 horas de luz. Por eso cada día termina en un punto de costa para el atardecer."],
  ["🌄 Gaztelugatxe al amanecer","Antes de las 10:00 no hay control de acceso. Llega hacia las 8:15 y lleva frontal: la bajada son 1,2 km y 241 escalones."],
  ["🌊 Ojo al tiempo","El camino puede cerrarse por temporal. Consulta Euskalmet la víspera; si el lunes viene mal, cambia el día de costa con el domingo."],
  ["🅿️ Aparcar en la costa","Hay pocas plazas (22 en Urizarreta y 57 en Lurgorri). Por la mañana temprano y a última hora de la tarde hay sitio."],
- ["🏛️ Museos","Guggenheim: martes a domingo (el lunes suele cerrar), compra online. Bellas Artes: gratis, cierra los martes y el domingo a las 15:00."],
+ ["🏛️ Museos","Guggenheim: martes a domingo (el lunes suele cerrar), compra online. Ve el domingo por la mañana."],
  ["🥘 Pintxos","Plaza Nueva y las Siete Calles. En el puente se llena: ve pronto (19:30–20:00) y muévete de bar en bar."],
  ["🚗 Carretera","El tramo estatal de la AP-68 es gratis desde el 11/11/2026; los tramos vascos siguen de pago. Es operación salida: sal pronto."]
 ];
 document.getElementById('acc').innerHTML=TIPS.map((t,i)=>`<div class="acc${i===0?' open':''}"><button>${t[0]}</button><div>${t[1]}</div></div>`).join('');
 document.getElementById('acc').addEventListener('click',e=>{const b=e.target.closest('button');if(b)b.parentElement.classList.toggle('open');});
-const LINKS=[["Gaztelugatxe · reservas","https://www.bizkaia.eus/es/gaztelugatxe"],["Museo Guggenheim","https://www.guggenheim-bilbao.eus"],["Bellas Artes","https://www.museobilbao.com"],["Euskalmet · tiempo","https://www.euskalmet.euskadi.eus"],["Bilbao Turismo","https://www.bilbaoturismo.net"],["Puente Colgante","https://puente-colgante.com"],["Museo de la Paz","https://www.museodelapaz.eus"],["DGT · tráfico","https://www.dgt.es/conoce-el-estado-del-trafico/"]];
+const LINKS=[["Tabla de mareas","https://tablademareas.com/es/pais-vasco"],["Geoparque Costa Vasca","https://geoparkea.eus"],["Gaztelugatxe · reservas","https://www.bizkaia.eus/es/gaztelugatxe"],["Museo Guggenheim","https://www.guggenheim-bilbao.eus"],["Euskalmet · tiempo","https://www.euskalmet.euskadi.eus"],["Bilbao Turismo","https://www.bilbaoturismo.net"],["Puente Colgante","https://puente-colgante.com"],["DGT · tráfico","https://www.dgt.es/conoce-el-estado-del-trafico/"]];
 document.getElementById('links').innerHTML=LINKS.map(l=>`<a href="${l[1]}" target="_blank" rel="noopener">${l[0]}<span>↗</span></a>`).join('');
 
 /* ---------- INICIO ---------- */
